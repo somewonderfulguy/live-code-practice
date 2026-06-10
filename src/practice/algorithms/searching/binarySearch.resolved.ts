@@ -2,29 +2,29 @@ function binarySearch<TElem>(
   sortedArray: TElem[],
   target: TElem,
   compare: (a: TElem, b: TElem) => number
-): number {}
+): number {
+  return -1
+}
 
 function binarySearchSimple<TElem>(
   sortedArray: TElem[],
   target: TElem
-): number {}
+): number {
+  let left = 0
+  let right = sortedArray.length - 1
 
-type User = {
-  id: number
-  name: string
+  while (left <= right) {
+    const mid = left + Math.floor((right - left) / 2)
+    const current = sortedArray[mid]
+
+    if (current === target) return mid
+
+    if (target > current) {
+      left = mid + 1
+    } else {
+      right = mid - 1
+    }
+  }
+
+  return -1
 }
-
-const users: User[] = [
-  { id: 1, name: 'Alice' },
-  { id: 3, name: 'Bob' },
-  { id: 5, name: 'Charlie' }
-]
-
-const target = { id: 5, name: 'Charlie' }
-
-const result = binarySearch(users, target, (a, b) => a.id - b.id) // 1
-
-const arr = [2, 4, 5, 8, 11]
-const simpleResult = binarySearchSimple(arr, 8)
-
-console.log(result, simpleResult)
