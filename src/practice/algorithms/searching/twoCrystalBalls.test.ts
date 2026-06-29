@@ -24,9 +24,9 @@ function trackIndexedReads(breaks: boolean[]): {
         }
 
         return Reflect.get(target, property, receiver)
-      },
+      }
     }),
-    getReadCount: () => readCount,
+    getReadCount: () => readCount
   }
 }
 
