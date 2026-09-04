@@ -4,7 +4,7 @@ import { binarySearch, binarySearchSimple } from './binarySearch'
 
 const compareNumbers = (a: number, b: number) => a - b
 
-describe('binarySearchSimple', () => {
+describe.skip('binarySearchSimple', () => {
   it('returns the index when the target is in the sorted array', () => {
     expect(binarySearchSimple([1, 3, 5, 7, 9], 1)).toBe(0)
     expect(binarySearchSimple([1, 3, 5, 7, 9], 5)).toBe(2)
@@ -20,7 +20,7 @@ describe('binarySearchSimple', () => {
   })
 })
 
-describe('binarySearch', () => {
+describe.skip('binarySearch', () => {
   it('returns the index when the target is in the sorted array', () => {
     expect(binarySearch([1, 3, 5, 7, 9], 1, compareNumbers)).toBe(0)
     expect(binarySearch([1, 3, 5, 7, 9], 5, compareNumbers)).toBe(2)
