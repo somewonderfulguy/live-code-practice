@@ -4,6 +4,24 @@ Searching algorithms find a value or a transition point in a collection. The
 main question is what structure the input gives us. More structure usually
 means fewer checks.
 
+## Linear Search
+
+Linear search walks the collection from start to end and checks each item
+against the target. It is the baseline when the input has no useful structure.
+
+- Input requirement: none. The collection can be in any order.
+- Idea: iterate over each item and return once a match is found. Return a
+  not-found value if the end is reached without a match.
+- Time complexity: `O(n)`.
+- Space complexity: `O(1)`.
+- Good fit: small collections, unsorted data, or one-off lookups where paying
+  the cost to sort or build an index would not pay back.
+
+Linear search is the fallback that always works. Whenever more structure is
+available (sorted order, monotonicity, hashing), a faster search usually beats
+it, but it stays useful when that structure is missing or too expensive to
+maintain.
+
 ## Binary Search
 
 Binary search finds a target in a sorted array by repeatedly checking the
