@@ -56,10 +56,38 @@ values. The answer is the first `true` index, or `-1` when every floor is safe.
   small number of available attempts.
 
 This is not a normal binary search problem because a breaking drop destroys a
-ball. If the first binary-search probe breaks at the middle, only one ball is
-left, so the lower half must be scanned one floor at a time. That gives a worst
-case close to `O(n)`, not `O(log n)`.
+ball. Binary search assumes every probe is free to retry — the "wrong" half is
+just discarded. Here a probe that breaks the ball also costs us a ball. With
+only two balls, we cannot afford to keep halving: after the second break we
+have no way to test any more floors, so we must always leave enough safety
+margin to finish with a linear scan.
 
-The `sqrt(n)` jump strategy balances the two costs: at most about `sqrt(n)`
-jumps with the first ball, then at most about `sqrt(n)` linear checks with the
-second ball.
+Concretely: a binary search would probe the middle first. If that break
+happens, we have used one ball on a probe that leaves an uncertainty range of
+`n/2` floors. Ball two must now walk that range one floor at a time, because a
+second break ends the search. Worst case is about `n/2` drops, which is
+`O(n)` — the halving bought us nothing.
+
+So the real question is: how big a jump can the first ball take without
+leaving too large a block for the second ball to scan? Let the jump size be
+`k`. In the worst case the first ball takes up to `n/k` jumps before it
+breaks (or reaches the end), and the second ball then scans up to `k - 1`
+floors in the last block. Total worst-case drops:
+
+```
+f(k) = n/k + k
+```
+
+We want to pick the `k` that makes this smallest. The two terms pull in
+opposite directions: bigger `k` means fewer jumps for ball one but a longer
+linear scan for ball two, and smaller `k` is the opposite. The sum is
+minimized when the two terms are equal, i.e. `n/k = k`, which gives
+`k = sqrt(n)` and a total of `2 * sqrt(n)` drops. That is where the
+`O(sqrt(n))` bound comes from.
+
+The intuition to hold onto: with two balls, the second ball must always fall
+back to a linear scan, so its cost is the size of the block ball one leaves
+behind. Balancing the number of jumps against the size of that block is what
+`sqrt(n)` does — it is the step size where "how far we can leap" and "how
+much we might have to walk back" cost the same. The same reasoning generalizes:
+with `m` balls, the balanced step size is `n^(1/m)`.
