@@ -1,13 +1,5 @@
-function pluck<TItem, TKey extends keyof TItem>(
-  items: TItem[],
-  key: TKey
-): TItem[TKey][] {
-  return items.map((item) => item[key])
+// Task: collect one property from every item, accepting readonly input arrays.
+// Keep optional values in the result. See README.md for examples and constraints.
+export function pluck(_items: readonly object[], _key: PropertyKey): unknown[] {
+  throw new Error('TODO: implement pluck and its generic signature')
 }
-
-const dogs = [
-  { name: 'Mimi', age: 12 },
-  { name: 'LG', age: 13 }
-]
-
-pluck(dogs, 'age')
