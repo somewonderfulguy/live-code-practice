@@ -8,7 +8,7 @@ import { runRuntimeChecks } from './checks/runtime.cases.mjs'
 const folder = dirname(fileURLToPath(import.meta.url))
 const exercises = [
   'getProperty', 'pluck', 'updateEntity', 'narrowing', 'literals',
-  'mappedTypes', 'conditionalTypes', 'deepReadonly',
+  'mappedTypes', 'keyRemapping', 'eventConfig', 'conditionalTypes', 'deepReadonly',
 ]
 const [mode = 'reference', exercise] = process.argv.slice(2)
 

@@ -19,8 +19,10 @@ TODO error until implemented.
 | 4 | [narrowing.ts](narrowing.ts) | `unknown`, guards, discriminated unions, `never` |
 | 5 | [literals.ts](literals.ts) | `as const`, `satisfies`, derived unions and event names |
 | 6 | [mappedTypes.ts](mappedTypes.ts) | Keys, property modifiers, `Pick` and `Omit` |
-| 7 | [conditionalTypes.ts](conditionalTypes.ts) | Union distribution, `infer`, functions and promises |
-| 8 | [deepReadonly.ts](deepReadonly.ts) | Recursive types and tuple preservation |
+| 7 | [keyRemapping.ts](keyRemapping.ts) | Rename keys with `as`, template literals and `Capitalize` |
+| 8 | [eventConfig.ts](eventConfig.ts) | Map discriminated event unions to correctly typed handlers |
+| 9 | [conditionalTypes.ts](conditionalTypes.ts) | Union distribution, `infer`, functions and promises |
+| 10 | [deepReadonly.ts](deepReadonly.ts) | Recursive types and tuple preservation |
 
 For a short refresh, finish the first three and one narrowing exercise first.
 Then apply the same typing skills to the data-transformation tasks in the
@@ -199,7 +201,80 @@ Preserve existing readonly/optional modifiers unless the utility explicitly
 changes them. These transformations are shallow: a readonly property can still
 refer to a mutable object. Try numeric and symbol keys as well as strings.
 
-## 7. Conditional Types and Inference
+## 7. Remap Keys into Getters
+
+Implement `Getters<T>` in `keyRemapping.ts`. Use a mapped type's `as` clause
+to rename each string property to `get` followed by its capitalized name.
+The result should describe a zero-argument function returning that property's
+original value type.
+
+```ts
+type Person = { name: string; age: number; location: string }
+type LazyPerson = Getters<Person>
+// {
+//   getName: () => string
+//   getAge: () => number
+//   getLocation: () => string
+// }
+```
+
+- Preserve literal/union value types and existing readonly/optional modifiers.
+  For `readonly id: number`, the `getId` property is readonly.
+- For `email?: string`, the result has `getEmail?: () => string | undefined`:
+  the getter itself may be absent, and its result can be undefined.
+- Ignore numeric and symbol keys. A string key such as `'1'` still produces
+  `get1`; a numeric key `1` does not. An empty object produces an empty map.
+- Assume source names remain distinct after capitalization, so collisions such
+  as `name` and `Name` are outside this exercise.
+
+Explain what `as` changes, why `Capitalize` needs string keys, and how a key
+that becomes `never` is omitted. Keep the function result connected to the
+original property's type. This is a type-only task: it creates no getters at
+runtime and does not freeze any values.
+
+```bash
+node src/practice/typescript/check.mjs practice keyRemapping
+```
+
+## 8. Map an Event Union to Handlers
+
+Implement `EventConfig<Events extends { kind: string }>` in `eventConfig.ts`.
+Map over the event union itself and use each member's `kind` as the new key.
+Every key must have a required handler that receives that complete event member
+and returns `void`.
+
+```ts
+type SquareEvent = { kind: 'square'; x: number; y: number }
+type CircleEvent = { kind: 'circle'; radius: number }
+type Config = EventConfig<SquareEvent | CircleEvent>
+// {
+//   square: (event: SquareEvent) => void
+//   circle: (event: CircleEvent) => void
+// }
+```
+
+- Use a finite union with a distinct string-literal `kind` for each member.
+  Duplicate tags and broad `kind: string` inputs are outside this exercise.
+- A square handler's parameter must infer `SquareEvent`; it must not receive
+  the entire event union or only the string `'square'`.
+- Missing handlers, unknown keys on a fresh handler-map literal, and calls
+  with the wrong event kind or missing payload fields must fail compilation.
+- The generic constraint must reject members without a string `kind`.
+  A single event yields one handler; `never` yields an empty map.
+
+Explain how mapping over event objects differs from mapping over `keyof T`.
+These types describe callback contracts; they do not register handlers,
+dispatch events or validate incoming data.
+
+```bash
+node src/practice/typescript/check.mjs practice eventConfig
+```
+
+Both exercises follow the
+[TypeScript Handbook's key-remapping examples](https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#key-remapping-via-as).
+Use the practice contracts above before opening their resolved files.
+
+## 9. Conditional Types and Inference
 
 Conditional types choose a branch according to assignability. A condition on a
 naked type parameter distributes over union members; `infer` captures part of
@@ -223,7 +298,7 @@ Explain why the array-element union and tuple-head types differ. The older
 two operations distinct names. Compare one-level unwrapping with recursive
 `Awaited`. These are compiler exercises, with no runtime implementation.
 
-## 8. Recursive Readonly Types
+## 10. Recursive Readonly Types
 
 Implement `DeepReadonly<T>` for primitives, callable values, plain objects,
 arrays and tuples, including readonly inputs. Preserve tuple positions,
